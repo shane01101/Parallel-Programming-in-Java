@@ -111,27 +111,19 @@ public final class StudentAnalytics {
     public String mostCommonFirstNameOfInactiveStudentsParallelStream(
             final Student[] studentArray) 
     {
-        List<String> studentsList = Stream.of(studentArray)
+        String retVal = Stream.of(studentArray)
                 .parallel()
                 .filter(s -> !s.checkIsCurrent())
                 .map(fn -> fn.getFirstName())
-                .collect(Collectors.toList());
-        
-        Map<String, Integer> nameCounts = studentsList.parallelStream().
-            collect(Collectors.toMap(
-                w -> w, w -> 1, Integer::sum));
-        
-        String retVal = nameCounts.entrySet()
+                .collect(Collectors.toMap(
+                w -> w, w -> 1, Integer::sum))
+                .entrySet()
                 .stream()
                 .parallel()
                 .max((entry1, entry2) -> entry1.getValue() - entry2.getValue())
                 .get()
                 .getKey();
-        
-//        for (Map.Entry entry : nameCounts.entrySet()) 
-//        {
-//            System.out.println(entry.getKey() + ", " + entry.getValue());
-//        }   
+         
         return retVal;
     }
 
@@ -171,12 +163,9 @@ public final class StudentAnalytics {
     {
         long retVal = Stream.of(studentArray)
                 .parallel()
-                .filter(s -> s.getGrade() < 65)
-                .filter(a -> a.getAge() > 20)
-                .filter(s -> !s.checkIsCurrent())
-                .mapToDouble(a -> a.getAge())
+                .filter(s -> s.getGrade() < 65 && s.getAge() > 20 
+                        && !s.checkIsCurrent())
                 .count();
-                
         
         return (int) retVal;
     }
